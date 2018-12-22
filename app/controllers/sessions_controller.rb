@@ -4,7 +4,7 @@ class SessionsController < ApplicationController
   def create
     resp = Faraday.get("https://github.com/login/oauth/access_token") do |req|
       req.params['client_id'] = ENV['Github_Client_ID']
-      req.params['client_secret'] = ENV['FOURSQUARE_SECRET']
+      req.params['client_secret'] = ENV['Github_Client_Secret']
       req.params['grant_type'] = 'authorization_code'
       req.params['redirect_uri'] = "http://localhost:3000/auth"
       req.params['code'] = params[:code]
