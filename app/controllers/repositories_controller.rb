@@ -1,23 +1,28 @@
 class RepositoriesController < ApplicationController
-  
+
   def index
-    resp = Faraday.get("https://api.github.com/user/repos") do |req|
-      req.headers = {"Authorization": "token #{session[:token]}"}
+    user = Faraday.get 'https://api.github.com/user' do |req|
+      req.headers['Authorization'] = 'token ' + session[:token]
+      req.headers['Accept'] = 'application/json'
     end
-    user_resp = Faraday.get("https://api.github.com/user") do |req|
-      req.headers = {"Authorization": "token #{session[:token]}"}
+
+    @user_data = JSON.parse(user.body)
+
+    repos = Faraday.get 'https://api.github.com/user/repos' do |req|
+      req.headers['Authorization'] = 'token ' + session[:token]
+      req.headers['Accept'] = 'application/json'
     end
-    @user = JSON.parse(user_resp.body)["login"]
-    @repos = JSON.parse(resp.body)
+
+    @repos = JSON.parse(repos.body)
   end
 
   def create
-    resp = Faraday.post("https://api.github.com/user/repos") do |req|
-      req.headers = {"Authorization": "token #{session[:token]}", "Content-Type": "application/json"}
-      req.body = "{\"name\": \"#{params[:name]}\"}"
-      req.params[:scope] = "repo"
+    response = Faraday.post 'https://api.github.com/user/repos' do |req|
+      req.body = { 'name': params[:name] }.to_json
+      req.headers['Authorization'] = 'token ' + session[:token]
+      req.headers['Accept'] = 'application/json'
     end
-    binding.pry
-    redirect_to root_path
+    redirect_to '/'
   end
+
 end
